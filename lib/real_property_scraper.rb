@@ -5,7 +5,7 @@ require "nokogiri"
 require "pp"
 require "csv"
 
-class Scraper
+class RealPropertyScraper
   BASE_URL = "http://sdatcert3.resiusa.org/rp_rewrite/results.aspx?County=03&SearchType=STREET&StreetNumber=&StreetName=%s*"
 
   def initialize(combo)
@@ -75,6 +75,7 @@ class Scraper
   end
 end
 
+# this is what I ran from irb to collect the files
 def test_func(start_combo)
   cwd = File.dirname(__FILE__)
   date = Date.today
@@ -82,7 +83,7 @@ def test_func(start_combo)
 
   single_property_file = File.open("#{tmpdir}/single_properties.txt","a") do |single_props_file|
     (start_combo.."ZZZ").each do |combo|
-      props = Scraper.new(combo).scrape { |single_url| single_props_file.puts(single_url) }
+      props = RealPropertyScraper.new(combo).scrape { |single_url| single_props_file.puts(single_url) }
       next if props.empty?
       CSV.open("#{tmpdir}/#{combo}_#{date}.csv", "w") do |csv|
         props.each { |p| csv << p }
