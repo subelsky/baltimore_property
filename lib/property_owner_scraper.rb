@@ -24,7 +24,6 @@ class PropertyOwnerScraper
       retry
     end
 
-    puts "Searching for #{@block}-#{@lot}"
     page.form.field_with(id: "ctl00_ctl00_rootMasterContent_LocalContentPlaceHolder_txtBlock").value = @block
     page.form.field_with(id: "ctl00_ctl00_rootMasterContent_LocalContentPlaceHolder_txtLot").value = @lot
     button = page.form.button_with("ctl00$ctl00$rootMasterContent$LocalContentPlaceHolder$btnSearch")
@@ -36,25 +35,33 @@ class PropertyOwnerScraper
   end
 end
 
-# this is what I ran from irb to collect the files
-def test_property_owner_scraper(index = 0)
+# this is what I ran from irb to collect the data
+def test_property_owner_scraper
   cwd = File.dirname(__FILE__)
   date = Date.today
   tmpdir = "#{cwd}/../tmp"
 
-  props = CSV.read("#{tmpdir}/sorted_properties.csv")
+  props = CSV.read("#{tmpdir}/sorted_with_numbers.csv")
+  non_occupied = props.select { |p| p[3] == "N" }
 
-  CSV.open("#{tmpdir}/properties_with_owners.csv", "a") do |csv|
-    loop do
-      break unless property_details = props[index]
+  puts "Scraping nonoccupant owners for #{non_occupied.size} properties"
 
-      block, lot = property_details[1].split(/\s+/)[2,3]
-      scraper = PropertyOwnerScraper.new(block,lot)
-      owner_details = scraper.scrape
-      pp index => owner_details
-      csv << property_details + owner_details
+  non_occupied.each_slice(non_occupied.size / 10) do |slice|
+    Thread.new do
+      count = 1
 
-      index += 1
+      CSV.open("#{tmpdir}/properties_with_owners_#{Thread.current.object_id}.csv", "w") do |csv|
+        slice.each do |property_details|
+          block, lot = property_details[1].split(/\s+/)[2,3]
+          scraper = PropertyOwnerScraper.new(block,lot)
+          owner_details = scraper.scrape
+          puts "#{Thread.current.object_id}-#{count}"
+          csv << property_details + owner_details
+          count += 1
+        end
+      end
     end
   end
+
+  (Thread.list - [Thread.current]).each(&:join)
 end

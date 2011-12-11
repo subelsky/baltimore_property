@@ -75,14 +75,21 @@ class RealPropertyScraper
   end
 end
 
+# columns output are owner name, account num, street address, owner occupied or not, map # and parcel #
+# an N in the owner occupied column means it's not occupied
+
 # this is what I ran from irb to collect the files
-def test_real_prop_scraper(start_combo)
+# SDAT only returns up to 40 pages of 90 records at a time,
+# so when scraping letters you need to start at AAA and end at ZZZ or otherwise
+# you won't see some records. I also scraped 1* to 9* to get numbered streets
+
+def test_real_prop_scraper(start_combo,end_combo)
   cwd = File.dirname(__FILE__)
   date = Date.today
   tmpdir = "#{cwd}/../tmp"
 
   single_property_file = File.open("#{tmpdir}/single_properties.txt","a") do |single_props_file|
-    (start_combo.."ZZZ").each do |combo|
+    (start_combo..end_combo).each do |combo|
       props = RealPropertyScraper.new(combo).scrape { |single_url| single_props_file.puts(single_url) }
       next if props.empty?
       CSV.open("#{tmpdir}/#{combo}_#{date}.csv", "w") do |csv|
