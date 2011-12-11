@@ -76,7 +76,7 @@ class RealPropertyScraper
 end
 
 # this is what I ran from irb to collect the files
-def test_func(start_combo)
+def test_real_prop_scraper(start_combo)
   cwd = File.dirname(__FILE__)
   date = Date.today
   tmpdir = "#{cwd}/../tmp"

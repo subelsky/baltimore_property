@@ -37,24 +37,24 @@ class PropertyOwnerScraper
 end
 
 # this is what I ran from irb to collect the files
-def test_func
+def test_property_owner_scraper(index = 0)
   cwd = File.dirname(__FILE__)
   date = Date.today
   tmpdir = "#{cwd}/../tmp"
 
   props = CSV.read("#{tmpdir}/sorted_properties.csv")
 
-  props.each do |prop|
-    block, lot = prop[1].split(/\s+/)[2,3]
+  CSV.open("#{tmpdir}/properties_with_owners.csv", "a") do |csv|
+    loop do
+      break unless property_details = props[index]
 
-    scraper = PropertyOwnerScraper.new(block,lot)
-    owner_details = scraper.scrape
-    pp owner_details
-    props += owner_details
-  end
+      block, lot = property_details[1].split(/\s+/)[2,3]
+      scraper = PropertyOwnerScraper.new(block,lot)
+      owner_details = scraper.scrape
+      pp index => owner_details
+      csv << property_details + owner_details
 
-  CSV.open("#{tmpdir}/properties_with_owners.csv", "w") do |csv|
-    props.each { |p| csv << p }
+      index += 1
+    end
   end
 end
-
