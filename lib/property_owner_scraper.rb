@@ -19,7 +19,7 @@ class PropertyOwnerScraper
 
     begin
       page = @browser.get("http://cityservices.baltimorecity.gov/realproperty/default.aspx")
-    rescue StandardError => e
+    rescue Exception => e
       pp e
       retry
     end
@@ -41,12 +41,15 @@ def test_property_owner_scraper
   date = Date.today
   tmpdir = "#{cwd}/../tmp"
 
-  props = CSV.read("#{tmpdir}/sorted_with_numbers.csv")
-  non_occupied = props.select { |p| p[3] == "N" }
+  non_occupied = CSV.read("#{tmpdir}/nonoccupied.csv")
+  #non_occupied = props.select { |p| p[3] == "N" }
 
-  puts "Scraping nonoccupant owners for #{non_occupied.size} properties"
+  already_scraped = CSV.read("./tmp/nonocc_props_with_owners.csv").inject({}) { |total,r| total.merge!(r[1] => true); total }
+  need_scraping = non_occupied.reject { |r| already_scraped.include?(r[1]) }
 
-  non_occupied.each_slice(non_occupied.size / 10) do |slice|
+  puts "Scraping nonoccupant owners for #{need_scraping.size} properties"
+
+  need_scraping.each_slice(need_scraping.size / 10) do |slice|
     Thread.new do
       count = 1
 
