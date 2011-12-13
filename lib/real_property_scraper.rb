@@ -5,6 +5,8 @@ require "nokogiri"
 require "pp"
 require "csv"
 
+# scrapes MD SDAT real property database; use this to get every property in
+# Baltimore, vacant or not
 class RealPropertyScraper
   BASE_URL = "http://sdatcert3.resiusa.org/rp_rewrite/results.aspx?County=03&SearchType=STREET&StreetNumber=&StreetName=%s*"
 
