@@ -27,10 +27,18 @@ class PropertyOwnerScraper
     page.form.field_with(id: "ctl00_ctl00_rootMasterContent_LocalContentPlaceHolder_txtBlock").value = @block
     page.form.field_with(id: "ctl00_ctl00_rootMasterContent_LocalContentPlaceHolder_txtLot").value = @lot
     button = page.form.button_with("ctl00$ctl00$rootMasterContent$LocalContentPlaceHolder$btnSearch")
-    page = page.form.submit(button)
+
+    begin
+      page = page.form.submit(button)
+    rescue Exception => e
+      pp e
+      retry
+    end
 
     (1..4).collect do |num|
-      page.at("//span[@id='ctl00_ctl00_rootMasterContent_LocalContentPlaceHolder_DataGrid1_ctl02_lblOwner#{num}']").text.strip
+      node = page.at("//span[@id='ctl00_ctl00_rootMasterContent_LocalContentPlaceHolder_DataGrid1_ctl02_lblOwner#{num}']")
+      next "" if node.nil?
+      node.text.strip
     end
   end
 end
@@ -41,28 +49,30 @@ def test_property_owner_scraper
   date = Date.today
   tmpdir = "#{cwd}/../tmp"
 
-  non_occupied = CSV.read("#{tmpdir}/nonoccupied.csv")
-  #non_occupied = props.select { |p| p[3] == "N" }
+  non_occupied = props.select { |p| p[3] == "N" }
 
-  already_scraped = CSV.read("./tmp/nonocc_props_with_owners.csv").inject({}) { |total,r| total.merge!(r[1] => true); total }
-  need_scraping = non_occupied.reject { |r| already_scraped.include?(r[1]) }
+  puts "Scraping nonoccupant owners for #{non_occupied.size} properties"
 
-  puts "Scraping nonoccupant owners for #{need_scraping.size} properties"
-
-  need_scraping.each_slice(need_scraping.size / 10) do |slice|
+  non_occupied.each_slice(non_occupied.size / 10) do |slice|
     Thread.new do
-      count = 1
+      out_dir = "#{tmpdir}/owners3/#{Thread.current.object_id}"
+      `mkdir -p #{out_dir}`
 
-      CSV.open("#{tmpdir}/properties_with_owners_#{Thread.current.object_id}.csv", "w") do |csv|
-        slice.each do |property_details|
-          block, lot = property_details[1].split(/\s+/)[2,3]
+      slice.each do |property_details|
+        block, lot = Array(property_details[1].split(/\s+/))[2,3]
+
+        unless block && lot
+          puts "unable to read #{property_details.inspect}"
+          next
+        end
+
+        File.open("#{out_dir}/#{block}-#{lot}.tsv", "w") do |f|
           scraper = PropertyOwnerScraper.new(block,lot)
           owner_details = scraper.scrape
-          puts "#{Thread.current.object_id}-#{count}"
-          csv << property_details + owner_details
-          count += 1
+          f.puts((property_details + owner_details).join("\t"))
         end
       end
+      puts "#{Thread.current.object_id} complete"
     end
   end
 
