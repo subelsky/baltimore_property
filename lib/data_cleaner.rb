@@ -37,7 +37,7 @@ module DataCleaner
     owner_addr2, owner_addr3 = owner_lines
 
     result = [street_addr,map,parcel,block,lot,owner_names.sort.join(" & "),owner_street_addr,owner_addr2,owner_addr3,sdat_owner,account]
-    result.each { |r| r.to_s.gsub(/\s+/,' ') }
+    result.each { |r| r.to_s.gsub!(/\s+/,' ') }
     result
   end
 end
@@ -71,9 +71,16 @@ def run_cleaner(path,vacant_paths = ["./tmp/Vacant_Lots.csv","./tmp/Vacant_Build
   CSV.open("#{tmpdir}/cleaned_#{File.basename(path)}","w") do |out|
     out << ["Street Address","Map","Parcel","Block","Lot","City Owner Names","City Owner Street Address","City Owner Address 2","City Owner Address 3","SDAT Owner Name","SDAT Account","In Vacant Database?"]
     CSV.read(path).each do |row|
-      cleaned = DataCleaner.clean(row)
-      pp row
+      begin
+        cleaned = DataCleaner.clean(row)
+      rescue Exception => e
+        pp e
+        pp row
+        next
+      end
+
       out << cleaned + [vacant_looker.vacant?(cleaned[0],cleaned[3],cleaned[4]) ? "1" : "0"]
     end
   end
+  nil
 end
