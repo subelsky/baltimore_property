@@ -11,9 +11,13 @@ Bladow](http://www.linkedin.com/in/kbladow) suggested I tackle this project.
 
 Data
 ====
-The raw data is in the `data` directory. One file is CSV formatted and contains
-the results of running these scripts. The other is a Google Refine project which
-contains several important transformations and cleanups of the raw CSV.
+All of the data have been published to https://github.com/subelsky/baltimore_property/downloads.
+I recommend you work with `refined_non_owner_occupied_properties.csv.gz` if you
+need the raw data.
+
+If you'd like to do further refinement you can use the `google_refine_baltimore_non_owner_occupied_properties.tar.gz` file.
+
+If you'd prefer to do your own refining then `baltimore_nonowner_occupied_properties.csv.gz` is there for you!
 
 Questions?
 ==========
