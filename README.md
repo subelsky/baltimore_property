@@ -2,7 +2,7 @@ Baltimore Property Scraper
 ==========================
 I used this code to scrape three databases for information about non-owner
 occupied property in Baltimore, in hopes of identifying entities which own a
-large number of vacant properties. Check out (http://subelsky.com) for a full
+large number of vacant properties. Check out http://subelsky.com for a full
 explanation and important caveats.
 
 I was inspired by the work at [Baltimore Slumlord
@@ -17,7 +17,8 @@ contains several important transformations and cleanups of the raw CSV.
 
 Questions?
 ==========
-Email [mike@subelsky.com] or hit me on Twitter at @subelsky.
+Email me at mike@subelsky.com or hit me up at
+[@subelsky](https://twitter.com/subelsky).
 
 License
 =======
