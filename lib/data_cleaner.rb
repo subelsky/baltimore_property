@@ -42,6 +42,8 @@ module DataCleaner
   end
 end
 
+# note this is the old way of looking up vacants. See lib/vacant_matcher.rb for
+# the new way
 class VacantLooker
   def initialize(paths)
     @paths = Array(paths)
