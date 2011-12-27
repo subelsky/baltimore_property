@@ -2,11 +2,12 @@ Baltimore Property Scraper
 ==========================
 I used this code to scrape three databases for information about non-owner
 occupied property in Baltimore, in hopes of identifying entities which own a
-large number of vacant properties. Check out http://subelsky.com for a full
+large number of vacant properties. Check out [the blog
+post](http://www.subelsky.com/2011/12/who-owns-vacant-properties-in-baltimore.html) for a full
 explanation and important caveats.
 
 I was inspired by the work at [Baltimore Slumlord
-Watch](http://slumlordwatch.wordpress.com/), and [Kate
+Watch](http://slumlordwatch.wordpress.com/). [Kate
 Bladow](http://www.linkedin.com/in/kbladow) suggested I tackle this project.
 
 Data
